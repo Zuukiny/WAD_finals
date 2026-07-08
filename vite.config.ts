@@ -6,6 +6,13 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vite.dev/config/
 export default defineConfig({
+  server: {
+    proxy: {
+      '/login': 'http://localhost:3000',
+      '/loc': 'http://localhost:3000',
+      '/uploads': 'http://localhost:3000',
+    },
+  },
   plugins: [
     vue(),
     vueDevTools(),
