@@ -8,7 +8,9 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: () => import('@/views/LoginView.vue'),
-      meta: { public: true },
+      // public: reachable without being logged in
+      // guestOnly: logged-in users get redirected away from it (only applies to login)
+      meta: { public: true, guestOnly: true },
     },
     {
       path: '/',
@@ -27,19 +29,32 @@ const router = createRouter({
       component: () => import('@/views/LocationDetailView.vue'),
       props: true,
     },
+    {
+      path: '/impressum',
+      name: 'impressum',
+      component: () => import('@/views/ImpressumView.vue'),
+      meta: { public: true },
+    },
+    {
+      path: '/datenschutz',
+      name: 'datenschutz',
+      component: () => import('@/views/DatenschutzView.vue'),
+      meta: { public: true },
+    },
   ],
 })
 
 router.beforeEach((to) => {
   const auth = useAuthStore()
 
-  // Not logged in -> only the login page is reachable
+  // Not logged in -> only public pages (login, impressum, datenschutz) are reachable
   if (!to.meta.public && !auth.isLoggedIn) {
     return { name: 'login' }
   }
 
   // Already logged in -> don't show the login screen again
-  if (to.meta.public && auth.isLoggedIn) {
+  // (Impressum/Datenschutz stay reachable either way, so they're NOT guestOnly)
+  if (to.meta.guestOnly && auth.isLoggedIn) {
     return { name: 'main' }
   }
 

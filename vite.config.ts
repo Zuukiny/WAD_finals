@@ -8,9 +8,19 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 export default defineConfig({
   server: {
     proxy: {
-      '/login': 'http://localhost:3000',
-      '/loc': 'http://localhost:3000',
-      '/uploads': 'http://localhost:3000',
+      '^/login$': {
+        target: 'http://localhost:3000',
+        bypass: (req) => {
+          if (req.method === 'GET') {
+            // Returning the (unchanged) url tells Vite to skip the proxy
+            // and continue its own middleware chain (SPA fallback) instead.
+            return req.url
+          }
+          // returning undefined here means: proxy it (POST /login call)
+        },
+      },
+      '^/loc($|/)': 'http://localhost:3000',
+      '^/uploads/': 'http://localhost:3000',
     },
   },
   plugins: [
